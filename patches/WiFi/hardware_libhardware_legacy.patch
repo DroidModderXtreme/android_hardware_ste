@@ -1,7 +1,7 @@
-diff --git a/hardware/libhardware_legacy/wifi/wifi/wifi.c b/hardware/libhardware_legacy/wifi/wifi/wifi.c
+diff --git a/hardware/libhardware_legacy/wifi/wifi.c b/hardware/libhardware_legacy/wifi/wifi.c
 index 5c8a11f..7fa631d 100644
---- a/hardware/libhardware_legacy/wifi/wifi/wifi.c
-+++ b/hardware/libhardware_legacy/wifi/wifi/wifi.c
+--- a/hardware/libhardware_legacy/wifi/wifi.c
++++ b/hardware/libhardware_legacy/wifi/wifi.c
 @@ -70,7 +70,7 @@ static char primary_iface[PROPERTY_VALUE_MAX];
  // sockets is in
  
