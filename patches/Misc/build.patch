@@ -1,0 +1,14 @@
+diff --git a/build/envsetup.sh b/build/envsetup.sh
+index a5cc21c..3537b23 100644
+--- a/build/envsetup.sh
++++ b/build/envsetup.sh
+@@ -153,7 +153,7 @@ function setpaths()
+     case $ARCH in
+         x86) toolchaindir=x86/i686-linux-android-$targetgccversion/bin
+             ;;
+-        arm) toolchaindir=arm/arm-linux-androideabi-$targetgccversion/bin
++        arm) toolchaindir=arm/linaro-4.8.3/bin
+             ;;
+         mips) toolchaindir=mips/mipsel-linux-android-$targetgccversion/bin
+             ;;
+ 
