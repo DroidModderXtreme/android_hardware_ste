@@ -38,3 +38,15 @@ index c3b3a42..d0af101 100644
  LOCAL_PATH := $(call my-dir)
  include $(CLEAR_VARS)
  
+diff --git a/hardware/qcom/fm/jni/android_hardware_fm.cpp b/hardware/qcom/fm/jni/android_hardware_fm.cpp
+index 46ae7c4..4608d03 100644
+--- a/hardware/qcom/fm/jni/android_hardware_fm.cpp
++++ b/hardware/qcom/fm/jni/android_hardware_fm.cpp
+@@ -36,7 +36,6 @@
+ #include <cutils/properties.h>
+ #include <fcntl.h>
+ #include <sys/ioctl.h>
+-#include <media/tavarua.h>
+ #include <linux/videodev2.h>
+ #include <math.h>
+ 
