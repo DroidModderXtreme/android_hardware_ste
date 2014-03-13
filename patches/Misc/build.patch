@@ -1,3 +1,16 @@
+diff --git a/build/core/tasks/kernel.mk b/build/core/tasks/kernel.mk
+index b09e5d1..2a876da 100644
+--- a/build/core/tasks/kernel.mk
++++ b/build/core/tasks/kernel.mk
+@@ -145,7 +145,7 @@ ifeq ($(TARGET_ARCH),arm)
+         ifeq ($(HOST_OS),darwin)
+             ARM_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilt/darwin-x86/toolchain/$(TARGET_KERNEL_CUSTOM_TOOLCHAIN)/bin/arm-eabi-"
+         else
+-            ARM_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilt/linux-x86/toolchain/$(TARGET_KERNEL_CUSTOM_TOOLCHAIN)/bin/arm-eabi-"
++            ARM_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilt/linux-x86/toolchain/$(TARGET_KERNEL_CUSTOM_TOOLCHAIN)"
+         endif
+     else
+         ARM_CROSS_COMPILE:=CROSS_COMPILE="$(ccache) $(ARM_EABI_TOOLCHAIN)/arm-eabi-"
 diff --git a/build/envsetup.sh b/build/envsetup.sh
 index a5cc21c..3537b23 100644
 --- a/build/envsetup.sh
@@ -11,4 +24,5 @@ index a5cc21c..3537b23 100644
              ;;
          mips) toolchaindir=mips/mipsel-linux-android-$targetgccversion/bin
              ;;
+
  
