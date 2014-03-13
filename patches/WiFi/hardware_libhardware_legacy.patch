@@ -39,7 +39,7 @@ index 5c8a11f..7fa631d 100644
      property_set("ctl.stop", supplicant_name);
      sched_yield();
  
-@@ -125,11 +125,11 @@ static const char FIRMWARE_LOADER[]     = WIFI_FIRMWARE_LOADER;
+@@ -129,7 +129,7 @@ static const char P2P_SUPPLICANT_NAME[] = "p2p_supplicant";
  static const char P2P_PROP_NAME[]       = "init.svc.p2p_supplicant";
  static const char SUPP_CONFIG_TEMPLATE[]= "/system/etc/wifi/wpa_supplicant.conf";
  static const char SUPP_CONFIG_FILE[]    = "/data/misc/wifi/wpa_supplicant.conf";
