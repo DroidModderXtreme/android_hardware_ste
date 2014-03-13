@@ -2073,7 +2073,7 @@ index 6758544..142716a 100644
          hfr = 0;
      }
  
--#ifndef 0
+-#if 0
 -    const char *hsr_str = params.get("video-hsr");
 -
 -    if(hsr_str && !strncmp(hsr_str,"on",2)) {
@@ -2093,7 +2093,7 @@ index 6758544..142716a 100644
 +        video_encoder videoEncoder) {
      status_t retVal = OK;
 -
--#ifndef 0
+-#if 0
 -    //Check HSR first, if HSR is enable set HSR to kKeyFrameRate
 -    int32_t hsr =0;
 -    if (meta->findInt32(kKeyHSR, &hsr)) {
