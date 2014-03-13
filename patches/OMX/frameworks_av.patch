@@ -1928,7 +1928,7 @@ index 890c200..ec3eb9b 100644
  
      struct AudioEncoderCap {
 diff --git a/frameworks/av/media/libmedia/MediaProfiles.cpp b/frameworks/av/media/libmedia/MediaProfiles.cpp
-index 792f60a..2837bab 100644
+index 2ccbba1..2837bab 100644
 --- a/frameworks/av/media/libmedia/MediaProfiles.cpp
 +++ b/frameworks/av/media/libmedia/MediaProfiles.cpp
 @@ -128,8 +128,6 @@ MediaProfiles::logVideoEncoderCap(const MediaProfiles::VideoEncoderCap& cap)
@@ -1940,10 +1940,14 @@ index 792f60a..2837bab 100644
  }
  
  /*static*/ void
-@@ -259,19 +257,16 @@ MediaProfiles::createVideoDecoderCap(const char **atts)
+@@ -259,30 +257,16 @@ MediaProfiles::createVideoDecoderCap(const char **atts)
  /*static*/ MediaProfiles::VideoEncoderCap*
  MediaProfiles::createVideoEncoderCap(const char **atts)
  {
+-    int maxHFRFrameWidth = 0;
+-    int maxHFRFrameHeight = 0;
+-    int maxHFRMode = 0;
+-
 -    CHECK(!strcmp("name",               atts[0])  &&
 -          !strcmp("enabled",            atts[2])  &&
 -          !strcmp("minBitRate",         atts[4])  &&
@@ -1953,10 +1957,17 @@ index 792f60a..2837bab 100644
 -          !strcmp("minFrameHeight",     atts[12]) &&
 -          !strcmp("maxFrameHeight",     atts[14]) &&
 -          !strcmp("minFrameRate",       atts[16]) &&
--          !strcmp("maxFrameRate",       atts[18]) &&
--          !strcmp("maxHFRFrameWidth",   atts[20]) &&
+-          !strcmp("maxFrameRate",       atts[18]));
+-
+-
+-    if (atts[20]) {
+-        CHECK(!strcmp("maxHFRFrameWidth",   atts[20]) &&
 -          !strcmp("maxHFRFrameHeight",  atts[22]) &&
 -          !strcmp("maxHFRMode",         atts[24]));
+-        maxHFRFrameWidth = atoi(atts[21]);
+-        maxHFRFrameHeight = atoi(atts[23]);
+-        maxHFRMode = atoi(atts[25]);
+-    }
 +    CHECK(!strcmp("name",           atts[0])  &&
 +          !strcmp("enabled",        atts[2])  &&
 +          !strcmp("minBitRate",     atts[4])  &&
@@ -1970,17 +1981,17 @@ index 792f60a..2837bab 100644
  
      const size_t nMappings = sizeof(sVideoEncoderNameMap)/sizeof(sVideoEncoderNameMap[0]);
      const int codec = findTagForName(sVideoEncoderNameMap, nMappings, atts[1]);
-@@ -280,8 +275,7 @@ MediaProfiles::createVideoEncoderCap(const char **atts)
+@@ -291,8 +275,7 @@ MediaProfiles::createVideoEncoderCap(const char **atts)
      MediaProfiles::VideoEncoderCap *cap =
          new MediaProfiles::VideoEncoderCap(static_cast<video_encoder>(codec),
              atoi(atts[5]), atoi(atts[7]), atoi(atts[9]), atoi(atts[11]), atoi(atts[13]),
--            atoi(atts[15]), atoi(atts[17]), atoi(atts[19]), atoi(atts[21]),
--            atoi(atts[23]), atoi(atts[25]));
+-            atoi(atts[15]), atoi(atts[17]), atoi(atts[19]), maxHFRFrameWidth,
+-            maxHFRFrameHeight, maxHFRMode);
 +            atoi(atts[15]), atoi(atts[17]), atoi(atts[19]));
      logVideoEncoderCap(*cap);
      return cap;
  }
-@@ -666,14 +660,14 @@ MediaProfiles::getInstance()
+@@ -677,14 +660,14 @@ MediaProfiles::getInstance()
  MediaProfiles::createDefaultH263VideoEncoderCap()
  {
      return new MediaProfiles::VideoEncoderCap(
@@ -1997,7 +2008,7 @@ index 792f60a..2837bab 100644
  }
  
  
-@@ -1018,9 +1012,6 @@ int MediaProfiles::getVideoEncoderParamByName(const char *name, video_encoder co
+@@ -1029,9 +1012,6 @@ int MediaProfiles::getVideoEncoderParamByName(const char *name, video_encoder co
      if (!strcmp("enc.vid.bps.max", name)) return mVideoEncoders[index]->mMaxBitRate;
      if (!strcmp("enc.vid.fps.min", name)) return mVideoEncoders[index]->mMinFrameRate;
      if (!strcmp("enc.vid.fps.max", name)) return mVideoEncoders[index]->mMaxFrameRate;
@@ -2038,6 +2049,50 @@ index 290ec1d..5d9245f 100644
  
      sp<MediaSource> encoder = OMXCodec::Create(
              client.interface(), enc_meta,
+diff --git a/frameworks/av/media/libstagefright/ACodec.cpp b/frameworks/av/media/libstagefright/ACodec.cpp
+index f92b043..96c22f9 100755
+--- a/frameworks/av/media/libstagefright/ACodec.cpp
++++ b/frameworks/av/media/libstagefright/ACodec.cpp
+@@ -3914,6 +3914,19 @@ bool ACodec::LoadedState::onConfigureComponent(
+ 
+     CHECK(mCodec->mNode != NULL);
+ 
++    AString mime;
++    CHECK(msg->findString("mime", &mime));
++
++    status_t err = mCodec->configureCodec(mime.c_str(), msg);
++
++    if (err != OK) {
++        ALOGE("[%s] configureCodec returning error %d",
++              mCodec->mComponentName.c_str(), err);
++
++        mCodec->signalError(OMX_ErrorUndefined, err);
++        return false;
++    }
++
+     sp<RefBase> obj;
+     if (msg->findObject("native-window", &obj)
+             && strncmp("OMX.google.", mCodec->mComponentName.c_str(), 11)) {
+@@ -3928,19 +3941,6 @@ bool ACodec::LoadedState::onConfigureComponent(
+     }
+     CHECK_EQ((status_t)OK, mCodec->initNativeWindow());
+ 
+-    AString mime;
+-    CHECK(msg->findString("mime", &mime));
+-
+-    status_t err = mCodec->configureCodec(mime.c_str(), msg);
+-
+-    if (err != OK) {
+-        ALOGE("[%s] configureCodec returning error %d",
+-              mCodec->mComponentName.c_str(), err);
+-
+-        mCodec->signalError(OMX_ErrorUndefined, err);
+-        return false;
+-    }
+-
+     {
+         sp<AMessage> notify = mCodec->mNotify->dup();
+         notify->setInt32("what", ACodec::kWhatComponentConfigured);
 diff --git a/frameworks/av/media/libstagefright/Android.mk b/frameworks/av/media/libstagefright/Android.mk
 index 3c56a42..ddd13dc 100644
 --- a/frameworks/av/media/libstagefright/Android.mk
@@ -2066,7 +2121,7 @@ index 295c0f5..d2b1bd7 100644
  
  static const int64_t CAMERA_SOURCE_TIMEOUT_NS = 3000000000LL;
 diff --git a/frameworks/av/media/libstagefright/ExtendedUtils.cpp b/frameworks/av/media/libstagefright/ExtendedUtils.cpp
-index 6758544..142716a 100644
+index 66cc289..142716a 100644
 --- a/frameworks/av/media/libstagefright/ExtendedUtils.cpp
 +++ b/frameworks/av/media/libstagefright/ExtendedUtils.cpp
 @@ -74,84 +74,80 @@ void ExtendedUtils::HFR::setHFRIfEnabled(
@@ -2388,10 +2443,43 @@ index c9a33e8..fe0ed4f 100644
      // Language follows the three letter standard ISO-639-2/T
      // 'e', 'n', 'g' for "English", for instance.
 diff --git a/frameworks/av/media/libstagefright/OMXCodec.cpp b/frameworks/av/media/libstagefright/OMXCodec.cpp
-index 35c188e..07e356f 100644
+index 202baa7..07e356f 100644
 --- a/frameworks/av/media/libstagefright/OMXCodec.cpp
 +++ b/frameworks/av/media/libstagefright/OMXCodec.cpp
-@@ -1043,6 +1043,10 @@ status_t OMXCodec::setVideoInputFormat(
+@@ -760,15 +760,6 @@ status_t OMXCodec::configureCodec(const sp<MetaData> &meta) {
+                 return err;
+             }
+         } else {
+-
+-            if (mNativeWindow != NULL
+-                && !strncmp(mComponentName, "OMX.", 4)) {
+-                status_t err = initNativeWindow();
+-                if (err != OK) {
+-                    return err;
+-                }
+-            }
+-
+ #ifdef QCOM_HARDWARE
+             ExtendedCodec::configureVideoDecoder(
+                     meta, mMIME, mOMX, mFlags, mNode, mComponentName);
+@@ -825,6 +816,16 @@ status_t OMXCodec::configureCodec(const sp<MetaData> &meta) {
+         mQuirks &= ~kOutputBuffersAreUnreadable;
+     }
+ 
++    if (mNativeWindow != NULL
++        && !mIsEncoder
++        && !strncasecmp(mMIME, "video/", 6)
++        && !strncmp(mComponentName, "OMX.", 4)) {
++        status_t err = initNativeWindow();
++        if (err != OK) {
++            return err;
++        }
++    }
++
+     return OK;
+ }
+ 
+@@ -1042,6 +1043,10 @@ status_t OMXCodec::setVideoInputFormat(
      CHECK(success);
      CHECK(stride != 0);
  
@@ -2402,7 +2490,7 @@ index 35c188e..07e356f 100644
      OMX_VIDEO_CODINGTYPE compressionFormat = OMX_VIDEO_CodingUnused;
      if (!strcasecmp(MEDIA_MIMETYPE_VIDEO_AVC, mime)) {
          compressionFormat = OMX_VIDEO_CodingAVC;
-@@ -1303,6 +1307,10 @@ status_t OMXCodec::setupH263EncoderParameters(const sp<MetaData>& meta) {
+@@ -1302,6 +1307,10 @@ status_t OMXCodec::setupH263EncoderParameters(const sp<MetaData>& meta) {
      h263type.nAllowedPictureTypes =
          OMX_VIDEO_PictureTypeI | OMX_VIDEO_PictureTypeP;
  
@@ -2413,7 +2501,7 @@ index 35c188e..07e356f 100644
      h263type.nPFrames = setPFramesSpacing(iFramesInterval, frameRate);
      if (h263type.nPFrames == 0) {
          h263type.nAllowedPictureTypes = OMX_VIDEO_PictureTypeI;
-@@ -1354,6 +1362,10 @@ status_t OMXCodec::setupMPEG4EncoderParameters(const sp<MetaData>& meta) {
+@@ -1353,6 +1362,10 @@ status_t OMXCodec::setupMPEG4EncoderParameters(const sp<MetaData>& meta) {
      mpeg4type.nAllowedPictureTypes =
          OMX_VIDEO_PictureTypeI | OMX_VIDEO_PictureTypeP;
  
@@ -2424,7 +2512,7 @@ index 35c188e..07e356f 100644
      mpeg4type.nPFrames = setPFramesSpacing(iFramesInterval, frameRate);
      if (mpeg4type.nPFrames == 0) {
          mpeg4type.nAllowedPictureTypes = OMX_VIDEO_PictureTypeI;
-@@ -1415,6 +1427,10 @@ status_t OMXCodec::setupAVCEncoderParameters(const sp<MetaData>& meta) {
+@@ -1414,6 +1427,10 @@ status_t OMXCodec::setupAVCEncoderParameters(const sp<MetaData>& meta) {
      h264type.eProfile = static_cast<OMX_VIDEO_AVCPROFILETYPE>(profileLevel.mProfile);
      h264type.eLevel = static_cast<OMX_VIDEO_AVCLEVELTYPE>(profileLevel.mLevel);
  
