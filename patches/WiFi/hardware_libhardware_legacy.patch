@@ -40,11 +40,6 @@ index 5c8a11f..7fa631d 100644
      sched_yield();
  
 @@ -125,11 +125,11 @@ static const char FIRMWARE_LOADER[]     = WIFI_FIRMWARE_LOADER;
- static const char DRIVER_PROP_NAME[]    = "wlan.driver.status";
- static const char SUPPLICANT_NAME[]     = "wpa_supplicant";
- static const char SUPP_PROP_NAME[]      = "init.svc.wpa_supplicant";
--static const char P2P_SUPPLICANT_NAME[] = "p2p_supplicant";
-+static const char P2P_SUPPLICANT_NAME[] = "wpa_supplicant";
  static const char P2P_PROP_NAME[]       = "init.svc.p2p_supplicant";
  static const char SUPP_CONFIG_TEMPLATE[]= "/system/etc/wifi/wpa_supplicant.conf";
  static const char SUPP_CONFIG_FILE[]    = "/data/misc/wifi/wpa_supplicant.conf";
