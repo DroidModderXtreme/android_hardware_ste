@@ -61,7 +61,7 @@ diff --git a/external/bluetooth/bluez/tools/hciattach.c b/external/bluetooth/blu
 index db01b85..ffb13f5 100644
 --- a/external/bluetooth/bluez/tools/hciattach.c
 +++ b/external/bluetooth/bluez/tools/hciattach.c
-@@ -42,12 +42,12 @@
+@@ -42,9 +42,9 @@
  #include <sys/param.h>
  #include <sys/ioctl.h>
  
