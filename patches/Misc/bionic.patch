@@ -13,5 +13,3 @@ index 156864c..502e8d6 100755
          if (phdr_table_unprotect_segments(si->phdr, si->phnum, si->load_bias) < 0) {
              DL_ERR("can't unprotect loadable segments for \"%s\": %s",
                     si->name, strerror(errno));
---
-1.8.3.2
