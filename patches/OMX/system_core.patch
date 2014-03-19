@@ -89,8 +89,8 @@ index 882a8b2..81049a1 100644
      // keep ownership. If a fd is not retained by unflatten() it must be
      // explicitly closed.
 -    inline status_t unflatten(void const*& buffer, size_t& size, int const*& fds, size_t& count);
+-};
 +    virtual status_t unflatten(void const*& buffer, size_t& size, int const*& fds, size_t& count) = 0;
- };
  
 -template<typename T>
 -inline size_t Flattenable<T>::getFlattenedSize() const {
