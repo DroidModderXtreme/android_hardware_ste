@@ -1,17 +1,17 @@
 diff --git a/bionic/linker/linker.cpp b/bionic/linker/linker.cpp
-index 623be29..9a22d96 100644
+index 156864c..502e8d6 100755
 --- a/bionic/linker/linker.cpp
 +++ b/bionic/linker/linker.cpp
-@@ -1531,8 +1531,8 @@ static bool soinfo_link_image(soinfo* si) {
-          * phdr_table_protect_segments() after all of them are applied
-          * and all constructors are run.
-          */
--        DEBUG("%s has text relocations. This is wasting memory and is "
--                "a security risk. Please fix.", si->name);
-+        //DEBUG("%s has text relocations. This is wasting memory and is "
-+        //        "a security risk. Please fix.", si->name);
+@@ -1834,8 +1834,8 @@ static bool soinfo_link_image(soinfo* si) {
+     if (si->has_text_relocations) {
+         // Make segments writable to allow text relocations to work properly. We will later call
+         // phdr_table_protect_segments() after all of them are applied and all constructors are run.
+-        DL_WARN("%s has text relocations. This is wasting memory and prevents "
+-                "security hardening. Please fix.", si->name);
++        //DL_WARN("%s has text relocations. This is wasting memory and prevents "
++        //        "security hardening. Please fix.", si->name);
          if (phdr_table_unprotect_segments(si->phdr, si->phnum, si->load_bias) < 0) {
              DL_ERR("can't unprotect loadable segments for \"%s\": %s",
                     si->name, strerror(errno));
--- 
-1.8.5.3
+--
+1.8.3.2
