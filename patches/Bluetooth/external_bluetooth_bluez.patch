@@ -74,7 +74,6 @@ index db01b85..ffb13f5 100644
  
  #include "hciattach.h"
  
- struct uart_t {
 @@ -1075,6 +710,10 @@ struct uart_t uart[] = {
  	{ "texasalt",   0x0000, 0x0000, HCI_UART_LL,   115200, 115200,
  				FLOW_CTL, DISABLE_PM, NULL, texasalt, NULL   },
